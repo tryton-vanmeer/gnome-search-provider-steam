@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=dev.trytonvanmeer.Steam.SearchProvider
+Exec=/bin/false
+SystemdService=dev.trytonvanmeer.Steam.SearchProvider.service

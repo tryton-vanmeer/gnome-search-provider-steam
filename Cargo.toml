@@ -1,0 +1,10 @@
+[package]
+name = "gnome-search-provider-steam"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tryton Lux <code@trytonvanmeer.dev>"]
+
+[dependencies]
+search-provider = { version = "0.10.0", default-features = false, features = ["tokio"] }
+tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+zbus = { version = "4.4.0", features = ["tokio"] }

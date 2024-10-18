@@ -1,0 +1,7 @@
+[Unit]
+Description=Steam search provider for Gnome shell
+
+[Service]
+Type=dbus
+BusName=dev.trytonvanmeer.Steam.SearchProvider
+ExecStart=gnome-search-provider-steam
