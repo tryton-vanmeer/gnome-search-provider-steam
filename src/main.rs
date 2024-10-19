@@ -8,12 +8,12 @@ type GameResults = HashMap<String, String>;
 
 #[derive(Debug)]
 struct Application {
-    results: GameResults,
+    games: GameResults,
 }
 
 impl SearchProviderImpl for Application {
     fn activate_result(&self, identifier: ResultID, _terms: &[String], _timestamp: u32) {
-        let result = self.results.get(&identifier);
+        let result = self.games.get(&identifier);
 
         println!(
             "activating result {:#?} identified by {}",
@@ -22,12 +22,18 @@ impl SearchProviderImpl for Application {
     }
 
     fn initial_result_set(&self, terms: &[String]) -> Vec<ResultID> {
-        // Here do your search logic
-        if terms.contains(&"game".to_owned()) {
-            vec!["some_key".to_owned()]
-        } else {
-            vec![]
+        let mut results = Vec::<ResultID>::new();
+
+        for (id, name) in self.games.iter() {
+            let name_lower = name.to_lowercase();
+            for term in terms {
+                if name_lower.contains(&term.to_lowercase()) {
+                    results.push(id.clone());
+                }
+            }
         }
+
+        results
     }
 
     fn result_metas(
@@ -37,8 +43,8 @@ impl SearchProviderImpl for Application {
         identifiers
             .iter()
             .map(|id| {
-                ResultMeta::builder(id.to_owned(), "Game Name")
-                    .description("appid")
+                ResultMeta::builder(id.to_owned(), self.games.get(id).unwrap())
+                    .description(id)
                     .build()
             })
             .collect()
@@ -71,7 +77,7 @@ fn get_games() -> Result<GameResults> {
 #[tokio::main]
 async fn main() -> Result<()> {
     let app = Application {
-        results: get_games()?,
+        games: get_games()?,
     };
     SearchProvider::new(
         app,
