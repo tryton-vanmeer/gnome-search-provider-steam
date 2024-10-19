@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, process::Command};
 
 use anyhow::Result;
 use search_provider::{ResultID, ResultMeta, SearchProvider, SearchProviderImpl};
@@ -13,12 +13,9 @@ struct Application {
 
 impl SearchProviderImpl for Application {
     fn activate_result(&self, identifier: ResultID, _terms: &[String], _timestamp: u32) {
-        let result = self.games.get(&identifier);
-
-        println!(
-            "activating result {:#?} identified by {}",
-            result, identifier
-        );
+        let _ = Command::new("xdg-open")
+            .arg(format!("steam://rungameid/{identifier}"))
+            .output();
     }
 
     fn initial_result_set(&self, terms: &[String]) -> Vec<ResultID> {
