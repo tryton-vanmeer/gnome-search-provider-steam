@@ -1,10 +1,14 @@
 use std::collections::HashMap;
 
+use anyhow::Result;
 use search_provider::{ResultID, ResultMeta, SearchProvider, SearchProviderImpl};
+use steamlocate::SteamDir;
+
+type GameResults = HashMap<String, String>;
 
 #[derive(Debug)]
 struct Application {
-    results: HashMap<String, String>,
+    results: GameResults,
 }
 
 impl SearchProviderImpl for Application {
@@ -41,12 +45,34 @@ impl SearchProviderImpl for Application {
     }
 }
 
-#[tokio::main]
-async fn main() -> zbus::Result<()> {
-    let mut results = HashMap::new();
-    results.insert("some_key".to_string(), "game".to_string());
+fn get_games() -> Result<GameResults> {
+    let mut results = GameResults::new();
+    let steam = SteamDir::locate()?;
 
-    let app = Application { results };
+    for library in steam.libraries()? {
+        match library {
+            Err(err) => eprintln!("failed reading library: {err}"),
+            Ok(library) => {
+                for app in library.apps() {
+                    match app {
+                        Err(err) => eprintln!("failed reading app: {err}"),
+                        Ok(app) => {
+                            results.insert(app.app_id.to_string(), app.name.unwrap());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(results)
+}
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    let app = Application {
+        results: get_games()?,
+    };
     SearchProvider::new(
         app,
         "dev.trytonvanmeer.Steam.SearchProvider",
