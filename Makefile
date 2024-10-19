@@ -23,8 +23,5 @@ install:
 log:
 	journalctl --user --follow --unit ${APPID}
 
-service-start:
-	systemctl --user start ${APPID}
-
 service-restart:
 	systemctl --user daemon-reload && systemctl --user restart ${APPID}
