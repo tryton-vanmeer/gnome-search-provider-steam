@@ -1,4 +1,4 @@
-use std::{collections::HashMap, process::Command};
+use std::collections::HashMap;
 
 use anyhow::Result;
 use search_provider::{ResultID, ResultMeta, SearchProvider, SearchProviderImpl};
@@ -13,9 +13,9 @@ struct Application {
 
 impl SearchProviderImpl for Application {
     fn activate_result(&self, identifier: ResultID, _terms: &[String], _timestamp: u32) {
-        let _ = Command::new("xdg-open")
-            .arg(format!("steam://rungameid/{identifier}"))
-            .output();
+        let uri = format!("steam://rungameid/{identifier}");
+
+        let _ = gio::AppInfo::launch_default_for_uri(&uri, gio::AppLaunchContext::NONE);
     }
 
     fn initial_result_set(&self, terms: &[String]) -> Vec<ResultID> {
