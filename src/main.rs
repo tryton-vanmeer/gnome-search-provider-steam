@@ -42,6 +42,7 @@ impl SearchProviderImpl for Application {
             .map(|id| {
                 ResultMeta::builder(id.to_owned(), self.games.get(id).unwrap())
                     .description(id)
+                    .gicon(&format!("steam_icon_{id}").to_owned())
                     .build()
             })
             .collect()
